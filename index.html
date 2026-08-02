@@ -1,0 +1,805 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trench Autopsy — which pumps are real</title>
+<meta name="description" content="Everyone posts what's pumping. We post which pumps are fake. Engagement vs mentions across the top-100 crypto social board, every 30 minutes. Receipts, not calls.">
+<link rel="canonical" href="https://trenchautopsy.xyz/">
+<meta property="og:title" content="Trench Autopsy — which pumps are real">
+<meta property="og:description" content="Engagement vs mentions, checked every 30 minutes. Real interest brings new people; fake interest is the same crowd getting louder.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://trenchautopsy.xyz/">
+<meta property="og:site_name" content="Trench Autopsy">
+<!-- summary_large_image needs an absolute URL on a reachable host; the card is generated
+     at publish time into the site root so it ships with the page and needs no CDN. -->
+<meta property="og:image" content="https://trenchautopsy.xyz/card.svg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Trench Autopsy — live verdict board: organic, thin and flat-mention counts.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Trench Autopsy — which pumps are real">
+<meta name="twitter:description" content="Everyone posts what's pumping. We post which pumps are fake. Verdicts refreshed every 30 minutes.">
+<meta name="twitter:image" content="https://trenchautopsy.xyz/card.svg">
+<meta name="theme-color" content="#0B0E13">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230A0D11'/%3E%3Cline x1='32' y1='68' x2='66' y2='34' stroke='%23237871' stroke-width='8'/%3E%3Ccircle cx='30' cy='70' r='11' fill='%23237871'/%3E%3Ccircle cx='68' cy='32' r='19' fill='%2363D2C5'/%3E%3C/svg%3E">
+<style>
+  /* Single-theme by commitment: the board is a morgue report read at night. Matches the
+     account's banner, avatar and analysis letter. */
+  :root{
+    --ground:#0B0E13; --panel:#12171F; --panel2:#0E1219; --hairline:#232B38;
+    --hairline2:#2E384A;
+    --ink:#E4E8EE; --dim:#8B94A5; --faint:#5C6675;
+    --pulse:#63D2C5; --deep:#237871; --death:#E5484D; --amber:#E0B457; --violet:#9D8BF0;
+    --serif:Georgia,'Times New Roman',serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    --maxw:1080px;
+  }
+  *{box-sizing:border-box}
+  html{background:var(--ground);scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}
+    *,*::before,*::after{animation-duration:.001ms !important;transition-duration:.001ms !important}}
+  body{margin:0;background:var(--ground);color:var(--ink);
+       font:16px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
+  .col{max-width:var(--maxw);margin:0 auto;padding:0 20px}
+  a{color:var(--pulse);text-underline-offset:3px}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--pulse);outline-offset:3px;border-radius:2px}
+  ::selection{background:rgba(99,210,197,.25)}
+
+  /* ---------- nav ---------- */
+  .nav{position:sticky;top:0;z-index:40;background:rgba(11,14,19,.86);
+       backdrop-filter:blur(12px);border-bottom:1px solid var(--hairline)}
+  .navin{max-width:var(--maxw);margin:0 auto;padding:11px 20px;display:flex;
+         align-items:center;gap:18px}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);flex:0 0 auto}
+  .brand span{font:700 13px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase}
+  .navlinks{display:flex;gap:2px;margin-left:auto;flex-wrap:wrap}
+  .navlinks a{font:600 12.5px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;
+    color:var(--dim);text-decoration:none;padding:8px 11px;border-radius:3px}
+  .navlinks a:hover{color:var(--ink);background:var(--panel)}
+  .navlinks a[aria-current="page"]{color:var(--pulse);background:rgba(99,210,197,.10)}
+  .live{display:flex;align-items:center;gap:6px;font:11px/1 var(--mono);color:var(--faint);
+        letter-spacing:.05em;white-space:nowrap;padding-left:6px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--pulse);flex:0 0 auto;
+       animation:pulse 2.4s ease-in-out infinite}
+  .dot.stale{background:var(--amber);animation:none}
+  @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(99,210,197,.45)}
+                   50%{opacity:.65;box-shadow:0 0 0 5px rgba(99,210,197,0)}}
+
+  /* ---------- routed views ---------- */
+  .view{display:none;animation:fade .28s ease}
+  .view.on{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+  section{margin:52px 0 0}
+  .exhibit{font:11px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;
+           color:var(--pulse);border-top:1px solid var(--hairline);padding-top:13px}
+  h2{font-family:var(--serif);font-size:clamp(21px,3vw,26px);font-weight:400;
+     margin:10px 0 4px;text-wrap:balance}
+  h3{font:700 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;
+     color:var(--dim);margin:26px 0 8px}
+  .why{color:var(--dim);font-size:14.5px;margin:0 0 16px;max-width:66ch}
+  p{max-width:66ch}
+
+  /* ---------- hero ---------- */
+  .hero{padding:60px 0 8px;position:relative;overflow:hidden}
+  .hero canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.30;
+               pointer-events:none;z-index:0}
+  .hero .col{position:relative;z-index:1}
+  .kicker{font:11px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(34px,6.4vw,58px);
+     line-height:1.08;margin:20px 0 0;max-width:19ch;text-wrap:balance}
+  h1 em{font-style:normal;color:var(--pulse)}
+  .lede{color:var(--dim);font-size:17px;max-width:56ch;margin:20px 0 0}
+  .heroctas{display:flex;gap:11px;flex-wrap:wrap;margin:28px 0 0}
+  .btn{display:inline-block;font:700 13px/1 var(--mono);letter-spacing:.05em;
+       padding:14px 22px;text-decoration:none;border:1px solid var(--pulse);
+       transition:filter .15s,transform .15s;border-radius:2px}
+  .btn.solid{background:var(--pulse);color:#06211D}
+  .btn.ghost{color:var(--pulse)}
+  .btn:hover{filter:brightness(1.14);transform:translateY(-1px)}
+
+  /* ---------- stat strip ---------- */
+  .strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:1px;
+         background:var(--hairline);border:1px solid var(--hairline);margin:40px 0 0}
+  .tile{background:var(--panel);padding:17px 15px 14px}
+  .tile b{display:block;font:700 clamp(22px,3.4vw,29px)/1.1 var(--mono);
+          font-variant-numeric:tabular-nums;letter-spacing:-.02em;margin-bottom:7px}
+  .tile b.dead{color:var(--death)} .tile b.live{color:var(--pulse)}
+  .tile span{font:10.5px/1.5 var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--dim)}
+
+  /* ---------- legend / chips ---------- */
+  .legend{display:flex;gap:9px;flex-wrap:wrap;margin:22px 0 0}
+  .lg{display:flex;align-items:baseline;gap:8px;background:var(--panel);
+      border:1px solid var(--hairline);padding:8px 12px;font-size:13.5px;color:var(--dim);border-radius:3px}
+  .lg b{font:700 11.5px/1 var(--mono);letter-spacing:.05em}
+  .g b{color:var(--pulse)} .a b{color:var(--amber)} .r b{color:var(--death)}
+  .chip{display:inline-block;font:700 11px/1 var(--mono);letter-spacing:.06em;
+        padding:5px 9px;border:1px solid;white-space:nowrap;border-radius:2px}
+  .chip.organic{color:var(--pulse);border-color:rgba(99,210,197,.45);background:rgba(99,210,197,.08)}
+  .chip.thin{color:var(--amber);border-color:rgba(224,180,87,.45);background:rgba(224,180,87,.07)}
+  .chip.flat{color:var(--death);border-color:rgba(229,72,77,.45);background:rgba(229,72,77,.08)}
+  .chip.quiet{color:var(--faint);border-color:var(--hairline)}
+
+  /* ---------- controls ---------- */
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 12px}
+  .filters{display:flex;gap:6px;flex-wrap:wrap}
+  .fbtn{font:600 11.5px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;
+        background:transparent;color:var(--dim);border:1px solid var(--hairline);
+        padding:8px 12px;border-radius:3px;cursor:pointer;transition:all .14s}
+  .fbtn:hover{border-color:var(--hairline2);color:var(--ink)}
+  .fbtn[aria-pressed="true"]{background:rgba(99,210,197,.12);border-color:rgba(99,210,197,.5);color:var(--pulse)}
+  .fbtn .n{opacity:.6;margin-left:5px;font-variant-numeric:tabular-nums}
+  .search{margin-left:auto;background:var(--panel);border:1px solid var(--hairline);
+    color:var(--ink);font:13px var(--mono);padding:9px 12px;border-radius:3px;min-width:150px}
+  .search::placeholder{color:var(--faint)}
+
+  /* ---------- table ---------- */
+  .tw{overflow-x:auto;border:1px solid var(--hairline);background:var(--panel);border-radius:3px}
+  table{border-collapse:collapse;width:100%;min-width:640px;font-size:14.5px}
+  th{font:700 10.5px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--faint);
+     text-align:left;padding:11px 14px;border-bottom:1px solid var(--hairline);
+     white-space:nowrap;position:sticky;top:0;background:var(--panel2);z-index:1}
+  th.s{cursor:pointer;user-select:none}
+  th.s:hover{color:var(--dim)}
+  th.s::after{content:"";opacity:0;margin-left:5px}
+  th.s[data-dir="desc"]::after{content:"▾";opacity:.85;color:var(--pulse)}
+  th.s[data-dir="asc"]::after{content:"▴";opacity:.85;color:var(--pulse)}
+  td{padding:11px 14px;border-bottom:1px solid var(--hairline);vertical-align:middle}
+  tr:last-child td{border-bottom:none}
+  tbody tr{transition:background .12s}
+  tbody tr:hover{background:rgba(255,255,255,.022)}
+  td.num,th.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+  .sym{font:700 14px/1 var(--mono)}
+  .name{color:var(--faint);font-size:12.5px}
+  .up{color:var(--pulse)} .down{color:var(--death)}
+  .spark{display:block}
+  .empty{padding:30px 14px;text-align:center;color:var(--faint);font-size:14px}
+  .roster{font:12.5px/1.7 var(--mono);color:var(--faint);margin:12px 2px 0}
+
+  .warn{border:1px solid var(--hairline);border-left:3px solid var(--amber);
+        background:var(--panel);padding:11px 14px;margin:0 0 14px;font-size:14px;color:var(--dim);border-radius:3px}
+
+  /* ---------- flags ---------- */
+  .flags{display:flex;flex-direction:column;gap:1px;background:var(--hairline);
+         border:1px solid var(--hairline);border-radius:3px;overflow:hidden}
+  .flag{display:flex;gap:14px;align-items:baseline;background:var(--panel);padding:12px 15px}
+  .flag .t{font:11.5px/1.6 var(--mono);color:var(--faint);flex:0 0 132px;
+           text-transform:uppercase;letter-spacing:.05em}
+  .flag .s{font:700 14px/1 var(--mono)}
+  .flag .w{color:var(--dim);font-size:13.5px}
+
+  /* ---------- cards / study ---------- */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0 0}
+  .card{border:1px solid var(--hairline);background:var(--panel);padding:16px 17px;border-radius:3px}
+  .card h4{font:700 11.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;
+           margin:0 0 8px;color:var(--pulse)}
+  .card p{color:var(--dim);font-size:14px;margin:.4rem 0;max-width:none}
+  .study{border:1px solid var(--hairline);background:var(--panel);padding:24px;position:relative;
+         overflow:hidden;border-radius:3px}
+  .stamp{position:absolute;top:18px;right:20px;transform:rotate(9deg);
+         font:700 25px/1 var(--mono);letter-spacing:.14em;color:var(--death);
+         border:3px solid var(--death);padding:6px 12px;opacity:.82}
+  .study h3{font-family:var(--serif);font-weight:400;font-size:20px;margin:0 0 10px;
+            max-width:30ch;color:var(--ink);text-transform:none;letter-spacing:0}
+  .studystats{font:12.5px/2 var(--mono);color:var(--ink)}
+  .studystats i{color:var(--faint);font-style:normal}
+  .terminal{background:#080B0F;border:1px solid var(--hairline);padding:17px 18px;
+            font:13.5px/1.85 var(--mono);overflow-x:auto;border-radius:3px}
+  .terminal .in{color:var(--ink)} .terminal .in::before{content:"you  › ";color:var(--faint)}
+  .terminal .out{color:var(--dim)} .terminal .out::before{content:"bot  › ";color:var(--faint)}
+  .terminal .bad{color:var(--death)} .terminal .good{color:var(--pulse)}
+  dl.defs{display:grid;grid-template-columns:max-content 1fr;gap:9px 20px;margin:0;
+          font-size:14.5px}
+  dl.defs dt{font:700 11.5px/1.7 var(--mono);color:var(--pulse);text-transform:uppercase;letter-spacing:.06em}
+  dl.defs dd{margin:0;color:var(--dim)}
+  @media(max-width:34rem){dl.defs{grid-template-columns:1fr;gap:3px 0}dl.defs dd{margin-bottom:10px}}
+
+  footer{margin:70px 0 0;border-top:1px solid var(--hairline);padding:22px 0 60px}
+  footer p{font:12px/1.85 var(--mono);color:var(--faint);max-width:none}
+
+  /* ---------- social ---------- */
+  .social{display:flex;align-items:center;gap:2px;flex:0 0 auto}
+  .social a{display:flex;align-items:center;justify-content:center;width:32px;height:32px;
+    color:var(--faint);border-radius:3px;transition:color .14s,background .14s}
+  .social a:hover{color:var(--pulse);background:var(--panel)}
+  .social svg{width:16px;height:16px;fill:currentColor;display:block}
+  .footrow{display:flex;flex-wrap:wrap;align-items:center;gap:14px 26px;margin:0 0 24px}
+  .footbrand{display:flex;align-items:center;gap:10px;margin-right:auto}
+  .footbrand span{font:700 12px/1 var(--mono);letter-spacing:.18em;
+    text-transform:uppercase;color:var(--dim)}
+  .foots{display:flex;flex-wrap:wrap;gap:8px}
+  .foots a{display:inline-flex;align-items:center;gap:8px;text-decoration:none;
+    font:600 12px/1 var(--mono);letter-spacing:.04em;color:var(--dim);
+    border:1px solid var(--hairline);padding:10px 13px;border-radius:3px;
+    transition:color .14s,border-color .14s,background .14s}
+  .foots a:hover{color:var(--pulse);border-color:rgba(99,210,197,.45);
+    background:rgba(99,210,197,.06)}
+  .foots svg{width:14px;height:14px;fill:currentColor;flex:0 0 auto}
+
+  /* ---------- narrow screens ----------
+     Nearly every visitor arrives by tapping a link inside a post, so the phone layout is
+     the primary one, not the fallback. */
+  .tw{position:relative}
+  .scrollhint{display:none;font:11px/1.6 var(--mono);letter-spacing:.06em;
+    text-transform:uppercase;color:var(--faint);margin:9px 2px 0}
+  @media(max-width:760px){
+    .col{padding:0 16px}
+    .navin{padding:9px 16px;gap:10px}
+    /* Scroll the link strip instead of wrapping it: wrapped, the sticky bar grows to
+       three rows and eats a third of a phone viewport on every scroll. */
+    .navlinks{margin-left:auto;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;
+      -webkit-overflow-scrolling:touch}
+    .navlinks::-webkit-scrollbar{display:none}
+    .navlinks a{padding:8px 9px;font-size:12px}
+    .hero{padding:34px 0 4px}
+    .heroctas .btn{flex:1 1 auto;text-align:center}
+    /* margin-left:auto strands the field at the right edge once the filters wrap */
+    .search{margin-left:0;width:100%}
+  }
+  @media(max-width:700px){.scrollhint{display:block}}
+  @media(max-width:600px){
+    .brand span{display:none}   /* the mark carries it; the wordmark is in the footer */
+    .nav .social{display:none}  /* same two links live in the footer, always reachable */
+    /* Tightened until all five routes fit a 390px bar: the strip scrolls, but a route
+       nobody can see is a route nobody visits, and /bot is the conversion route. */
+    .navlinks a{padding:8px 6px;font-size:11px;letter-spacing:.02em}
+    .live{font-size:10px;gap:5px}
+  }
+  @media(max-width:560px){
+    /* The stamp is absolutely positioned over the study heading. At this width the
+       heading wraps to three lines and the two overlap -- put the stamp back in flow. */
+    .stamp{position:static;transform:none;display:inline-block;font-size:18px;
+      padding:4px 9px;border-width:2px;margin:0 0 12px}
+    .study{padding:18px 16px}
+    /* A fixed 132px timestamp column leaves ~180px for the sentence that matters. */
+    .flag{flex-direction:column;gap:4px}
+    .flag .t{flex:none}
+    .tile{padding:14px 13px}
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="navin">
+    <a class="brand" href="#/">
+      <svg width="30" height="30" viewBox="0 0 100 100" aria-hidden="true">
+        <rect width="100" height="100" rx="20" fill="#0A0D11"/>
+        <line x1="32" y1="68" x2="66" y2="34" stroke="#237871" stroke-width="8"/>
+        <circle cx="30" cy="70" r="11" fill="#237871"/>
+        <circle cx="68" cy="32" r="19" fill="#63D2C5"/>
+      </svg>
+      <span>Trench&nbsp;Autopsy</span>
+    </a>
+    <div class="navlinks">
+      <a href="#/" data-route="/">Home</a>
+      <a href="#/board" data-route="/board">Board</a>
+      <a href="#/receipts" data-route="/receipts">Receipts</a>
+      <a href="#/method" data-route="/method">Method</a>
+      <a href="#/bot" data-route="/bot">Bot</a>
+    </div>
+    <div class="social">
+      <a href="https://x.com/trenchautopsy" rel="noopener" aria-label="Trench Autopsy on X"
+         title="@trenchautopsy on X">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </a>
+      <a href="https://t.me/TrenchAutopsy" rel="noopener" aria-label="Trench Autopsy on Telegram"
+         title="the flag feed on Telegram">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.91 3.79 20.3 20.84c-.25 1.21-.98 1.5-2 .94l-5.5-4.07-2.66 2.57c-.3.3-.55.56-1.1.56-.72 0-.6-.27-.84-.95L6.3 13.7.85 12c-1.18-.35-1.19-1.16.26-1.75l21.26-8.2c.97-.43 1.9.24 1.54 1.74z"/></svg>
+      </a>
+    </div>
+    <div class="live" title="the board regenerates every 30 minutes">
+      <i class="dot" id="liveDot"></i><span id="liveAge">live</span>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ HOME ============ -->
+<div class="view" id="v-home">
+  <div class="hero">
+    <canvas id="heroCanvas" aria-hidden="true"></canvas>
+    <div class="col">
+      <p class="kicker">Solana &amp; crypto social · regenerates every 30 min</p>
+      <h1>Everyone posts what's pumping.<br><em>We post which pumps are fake.</em></h1>
+      <p class="lede">Real interest brings new people. Fake interest is the same crowd
+        getting louder. We measure both — engagement against distinct mentions, across the
+        top-100 social board — and publish the verdict, not just the numbers.</p>
+      <div class="heroctas">
+        <a class="btn solid" href="#/board">See the live board</a>
+        <a class="btn ghost" href="https://t.me/TrenchAutopsyBot" rel="noopener">Free token checks</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="strip">
+      <div class="tile"><b class="live" id="hOrganic">—</b><span>tokens with new people arriving</span></div>
+      <div class="tile"><b class="dead" id="hFlat">—</b><span>same crowd, louder</span></div>
+      <div class="tile"><b id="hCalls">5210</b><span>calls archived · 759 accounts</span></div>
+      <div class="tile"><b class="dead">130/562</b><span>fresh low-cap calls whose pool left tracking ≤24h</span></div>
+    </div>
+
+    <section>
+      <div class="exhibit">What this is</div>
+      <h2>Three things, all free</h2>
+      <div class="cards">
+        <div class="card"><h4>The board</h4>
+          <p>Top movers every 30 minutes, each tagged 🟢 organic / 🟡 thin / 🔴 flat.
+             The verdict is the product — the raw numbers are on a hundred dashboards.</p>
+          <p><a href="#/board">Open the board →</a></p></div>
+        <div class="card"><h4>The receipts</h4>
+          <p>Every token call we sweep is priced at call time and checked at 24h and 7 days
+             — even when the post quietly disappears.</p>
+          <p><a href="#/receipts">See the receipts →</a></p></div>
+        <div class="card"><h4>The method</h4>
+          <p>One preregistered, one-shot test. We published the null. Hashes committed in
+             public so you can check we didn't move the goalposts.</p>
+          <p><a href="#/method">Read the method →</a></p></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="exhibit">The claim we can defend</div>
+      <h2>A ticker spikes 40% and everyone assumes demand</h2>
+      <p class="why">Usually it's one of three things — and the tell is identical every
+        time: engagement explodes while <strong>mentions stay flat</strong>. New people
+        showing up is what a real move looks like. More posts from the same accounts is
+        what manufactured attention looks like.</p>
+      <div class="legend">
+        <div class="lg g"><b>🟢 ORGANIC</b> mentions rising with engagement</div>
+        <div class="lg a"><b>🟡 THIN</b> engagement outpacing mentions</div>
+        <div class="lg r"><b>🔴 FLAT</b> mentions not moving</div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ============ BOARD ============ -->
+<div class="view" id="v-board"><div class="col">
+  <section style="margin-top:34px">
+    <div class="exhibit">Exhibit A — the live board</div>
+    <h2>Top movers, with the verdict attached</h2>
+    <p class="why">Change in 24h engagement vs change in distinct mentions, sampled every
+      30 minutes. Sort any column; filter by verdict; the sparkline is that token's
+      engagement across the last 12 hours of snapshots.</p>
+    <div class="warn">⚠ Data is 11230 minutes old — the refresh is behind; treat these numbers as indicative.</div>
+    <div class="warn">⚠ Partial market coverage this cycle — treat
+      the board as indicative.</div>
+
+    <div class="controls">
+      <div class="filters" id="filters">
+        <button class="fbtn" data-f="all" aria-pressed="true">All<span class="n" id="cAll"></span></button>
+        <button class="fbtn" data-f="organic" aria-pressed="false">🟢 Organic<span class="n" id="cOrganic"></span></button>
+        <button class="fbtn" data-f="thin" aria-pressed="false">🟡 Thin<span class="n" id="cThin"></span></button>
+        <button class="fbtn" data-f="flat" aria-pressed="false">🔴 Flat<span class="n" id="cFlat"></span></button>
+      </div>
+      <input class="search" id="search" type="search" placeholder="filter ticker…" aria-label="Filter by ticker">
+    </div>
+
+    <div class="tw"><table>
+      <thead><tr>
+        <th class="num">#</th>
+        <th class="s" data-k="symbol">token</th>
+        <th class="s num" data-k="en_pct" data-dir="desc">engagement 24h</th>
+        <th class="s num" data-k="me_pct">mentions 24h</th>
+        <th>12h trend</th>
+        <th class="s" data-k="tag">verdict</th>
+      </tr></thead>
+      <tbody id="boardBody">
+        <tr><td class="num">1</td>
+          <td><span class="sym">$RAY</span> <span class="name">· Raydium</span></td>
+          <td class="num up">+12.5%</td>
+          <td class="num up">+9.4%</td>
+          <td></td>
+          <td><span class="chip organic" title="mentions rising with engagement — new people arriving">🟢 ORGANIC</span></td></tr>
+        <tr><td class="num">2</td>
+          <td><span class="sym">$MAIGA</span> <span class="name">· MAIGA Token</span></td>
+          <td class="num up">+5.3%</td>
+          <td class="num ">+0.0%</td>
+          <td></td>
+          <td><span class="chip quiet" title="no meaningful engagement change this cycle">· QUIET</span></td></tr>
+        <tr><td class="num">3</td>
+          <td><span class="sym">$WIF</span> <span class="name">· dogwifhat</span></td>
+          <td class="num up">+5.0%</td>
+          <td class="num up">+22.0%</td>
+          <td></td>
+          <td><span class="chip quiet" title="no meaningful engagement change this cycle">· QUIET</span></td></tr>
+        <tr><td class="num">4</td>
+          <td><span class="sym">$USDC</span> <span class="name">· USDC</span></td>
+          <td class="num up">+4.9%</td>
+          <td class="num up">+0.3%</td>
+          <td></td>
+          <td><span class="chip quiet" title="no meaningful engagement change this cycle">· QUIET</span></td></tr>
+        <tr><td class="num">5</td>
+          <td><span class="sym">$DOT</span> <span class="name">· Polkadot</span></td>
+          <td class="num up">+4.4%</td>
+          <td class="num down">-1.5%</td>
+          <td></td>
+          <td><span class="chip quiet" title="no meaningful engagement change this cycle">· QUIET</span></td></tr>
+        <tr><td class="num">6</td>
+          <td><span class="sym">$CVX</span> <span class="name">· Convex Finance</span></td>
+          <td class="num up">+3.8%</td>
+          <td class="num down">-1.4%</td>
+          <td></td>
+          <td><span class="chip quiet" title="no meaningful engagement change this cycle">· QUIET</span></td></tr>
+        <tr><td class="num">7</td>
+          <td><span class="sym">$HEMI</span> <span class="name">· Hemi</span></td>
+          <td class="num up">+3.7%</td>
+          <td class="num up">+0.5%</td>
+          <td></td>
+          <td><span class="chip quiet" title="no meaningful engagement change this cycle">· QUIET</span></td></tr>
+        <tr><td class="num">8</td>
+          <td><span class="sym">$OKB</span> <span class="name">· OKB</span></td>
+          <td class="num up">+3.6%</td>
+          <td class="num down">-1.1%</td>
+          <td></td>
+          <td><span class="chip quiet" title="no meaningful engagement change this cycle">· QUIET</span></td></tr>
+        <tr><td class="num">9</td>
+          <td><span class="sym">$BABYDOGE</span> <span class="name">· Baby Doge 2.0</span></td>
+          <td class="num up">+2.9%</td>
+          <td class="num down">-1.4%</td>
+          <td></td>
+          <td><span class="chip quiet" title="no meaningful engagement change this cycle">· QUIET</span></td></tr>
+        <tr><td class="num">10</td>
+          <td><span class="sym">$WALLET</span> <span class="name">· Ambire Wallet</span></td>
+          <td class="num up">+2.8%</td>
+          <td class="num down">-0.2%</td>
+          <td></td>
+          <td><span class="chip quiet" title="no meaningful engagement change this cycle">· QUIET</span></td></tr>
+      </tbody>
+    </table></div>
+    <p class="scrollhint">↔ swipe the table for trend &amp; verdict</p>
+    <p class="roster" id="roster"></p>
+  </section>
+
+  <section>
+    <div class="exhibit">Exhibit B — recent flags</div>
+    <h2>Same crowd, louder — called in real time</h2>
+    <p class="why">Fired the moment a mover shows loud engagement on flat mentions. The
+      full feed is free on Telegram; X gets a capped trickle.</p>
+    
+    <div class="flags">
+      
+      <div class="flag"><span class="t">Aug 28 · 17:33 UTC</span>
+        <span class="s">$CVX</span>
+        <span class="w">engagement spiked · mentions flat at flag time</span></div>
+      
+      <div class="flag"><span class="t">Aug 28 · 15:03 UTC</span>
+        <span class="s">$USDD</span>
+        <span class="w">engagement spiked · mentions flat at flag time</span></div>
+      
+      <div class="flag"><span class="t">Aug 28 · 11:33 UTC</span>
+        <span class="s">$DONS</span>
+        <span class="w">engagement spiked · mentions flat at flag time</span></div>
+      
+      <div class="flag"><span class="t">Aug 28 · 6:33 UTC</span>
+        <span class="s">$IMX</span>
+        <span class="w">engagement spiked · mentions flat at flag time</span></div>
+      
+      <div class="flag"><span class="t">Aug 28 · 5:33 UTC</span>
+        <span class="s">$SUSD</span>
+        <span class="w">engagement spiked · mentions flat at flag time</span></div>
+      
+    </div>
+    
+  </section>
+</div></div>
+
+<!-- ============ RECEIPTS ============ -->
+<div class="view" id="v-receipts"><div class="col">
+  <section style="margin-top:34px">
+    <div class="exhibit">Exhibit C — trench receipts</div>
+    <h2>We archive the callers, not just the calls</h2>
+    <p class="why">Every token call our sweeps capture is priced at the moment of the call,
+      then checked again at 24 hours and 7 days. Posts that quietly disappear are recorded
+      too — deletion is an outcome.</p>
+    <div class="strip">
+      <div class="tile"><b>5210</b><span>calls archived · 759 accounts</span></div>
+      <div class="tile"><b class="dead">130/562</b>
+        <span>fresh low-cap calls whose pool left tracking ≤24h</span></div>
+      <div class="tile"><b>150↑ 166↓</b><span>low-cap calls at 24h · median +0%</span></div>
+      <div class="tile"><b class="dead">98</b>
+        <span>call posts no longer public</span></div>
+    </div>
+    <p class="why" style="margin-top:16px">7 caller(s) have cleared the 10-call evidence bar — the named board is live below.</p>
+
+    <h3>How a call gets scored</h3>
+    <dl class="defs">
+      <dt>captured</dt><dd>Cashtag posts from our sweeps are archived with the price, pool
+        and liquidity at that moment — before anyone knows the outcome.</dd>
+      <dt>trench only</dt><dd>Majors and deep-liquidity pools are excluded from scoring.
+        A $BTC mention is market commentary, not a trench call, and averaging it in would
+        flatten every number toward nothing.</dd>
+      <dt>24h / 7d</dt><dd>Priced again from the same pool. A missed window is recorded as
+        missed — never back-filled with a guess.</dd>
+      <dt>pool gone</dt><dd>The traded pool was no longer findable on public trackers at
+        the check. That is what we measured — not a claim about intent.</dd>
+    </dl>
+  </section>
+</div></div>
+
+<!-- ============ METHOD ============ -->
+<div class="view" id="v-method"><div class="col">
+  <section style="margin-top:34px">
+    <div class="exhibit">Exhibit D — the discipline</div>
+    <h2>We publish the results that hurt us</h2>
+    <div class="study">
+      <div class="stamp">NULL</div>
+      <h3>Can early "smart money" tell you which memecoins die?</h3>
+      <p class="studystats">
+        one-shot preregistered test · <i>answer:</i> <b>no</b> — coin flip<br>
+        249 launches measured cleanly · C-index 0.490 <i>(coin flip = 0.5)</i> ·
+        p = 0.59 · 95% dead ≤72h
+      </p>
+      <p>Signal, endpoint and statistics were frozen before the run; one authorised look,
+        permanently locked; announcements for every possible verdict drafted in advance.
+        The data picked this one. Anyone selling a smart-money signal on fresh launches
+        now has to beat a preregistered null.</p>
+      <p><a href="https://github.com/TrenchAutopsy/receipts" rel="noopener">Verify the
+        hashes yourself → github.com/TrenchAutopsy/receipts</a></p>
+    </div>
+
+    <h3>What the words mean</h3>
+    <dl class="defs">
+      <dt>engagement</dt><dd>Likes, replies and reposts on posts matching a token's symbol,
+        as a 24-hour total.</dd>
+      <dt>mentions</dt><dd>How many <em>distinct posts</em> exist. This is the one that
+        separates a crowd from an echo.</dd>
+      <dt>🔴 flat</dt><dd>Engagement moved, mentions didn't. It describes those two numbers
+        and nothing else — it is not an accusation of paid promotion.</dd>
+      <dt>🟢 organic</dt><dd>Mentions rose with engagement. Never a buy signal.</dd>
+      <dt>went dark</dt><dd>No longer listed or findable on the trackers we use at the
+        check. Abandonment looks the same from outside as a pull.</dd>
+      <dt>corrections</dt><dd>A correction gets the same reach as the claim it corrects.</dd>
+    </dl>
+  </section>
+</div></div>
+
+<!-- ============ BOT ============ -->
+<div class="view" id="v-bot"><div class="col">
+  <section style="margin-top:34px">
+    <div class="exhibit">Exhibit E — free, all of it</div>
+    <h2>Run the checks yourself</h2>
+    <p class="why">Rug verdicts, deployer rap sheets and crowd-real checks, free in the
+      bot. Every flag, uncapped, free in the channel. No token, no wallet connect.</p>
+    <div class="terminal" aria-label="Example bot conversation">
+      <div class="in">/check 7xKq…pump</div>
+      <div class="out"><span class="bad">🚫 AVOID</span> — deployer's record:
+        <span class="bad">5 of 6</span> launches went dark ≤72h</div>
+      <div class="in">/verdict SOL</div>
+      <div class="out">engagement +12% · mentions +9% → <span class="good">organic</span>,
+        new people arriving</div>
+      <div class="in">/autopsy 4Fgh…R2d9</div>
+      <div class="out">11 attributed launches · <span class="bad">11 went dark</span> ·
+        fastest: 41 min</div>
+      <div class="out"><span class="good">CLEAR</span> means "no red flag on the chain
+        facts" — it is never a buy signal.</div>
+    </div>
+    <div class="heroctas">
+      <a class="btn solid" href="https://t.me/TrenchAutopsyBot" rel="noopener">Open @TrenchAutopsyBot</a>
+      <a class="btn ghost" href="https://t.me/TrenchAutopsy" rel="noopener">Telegram feed</a>
+      <a class="btn ghost" href="https://x.com/trenchautopsy" rel="noopener">@trenchautopsy</a>
+    </div>
+  </section>
+</div></div>
+
+<footer><div class="col">
+  <div class="footrow">
+    <div class="footbrand">
+      <svg width="26" height="26" viewBox="0 0 100 100" aria-hidden="true">
+        <rect width="100" height="100" rx="20" fill="#0A0D11"/>
+        <line x1="32" y1="68" x2="66" y2="34" stroke="#237871" stroke-width="8"/>
+        <circle cx="30" cy="70" r="11" fill="#237871"/>
+        <circle cx="68" cy="32" r="19" fill="#63D2C5"/>
+      </svg>
+      <span>Trench&nbsp;Autopsy</span>
+    </div>
+    <div class="foots">
+      <a href="https://x.com/trenchautopsy" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        @trenchautopsy</a>
+      <a href="https://t.me/TrenchAutopsy" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.91 3.79 20.3 20.84c-.25 1.21-.98 1.5-2 .94l-5.5-4.07-2.66 2.57c-.3.3-.55.56-1.1.56-.72 0-.6-.27-.84-.95L6.3 13.7.85 12c-1.18-.35-1.19-1.16.26-1.75l21.26-8.2c.97-.43 1.9.24 1.54 1.74z"/></svg>
+        Flag feed</a>
+      <a href="https://t.me/TrenchAutopsyBot" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.91 3.79 20.3 20.84c-.25 1.21-.98 1.5-2 .94l-5.5-4.07-2.66 2.57c-.3.3-.55.56-1.1.56-.72 0-.6-.27-.84-.95L6.3 13.7.85 12c-1.18-.35-1.19-1.16.26-1.75l21.26-8.2c.97-.43 1.9.24 1.54 1.74z"/></svg>
+        @TrenchAutopsyBot</a>
+      <a href="https://github.com/TrenchAutopsy/receipts" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+        Receipts</a>
+    </div>
+  </div>
+  <p>DEFINITIONS &amp; HONESTY — Engagement = likes, replies, reposts on posts matching a
+  token's symbol; mentions = distinct posts. Both are 24-hour totals from aggregated
+  social + market data, diffed every 30 minutes. A 🔴 flag describes those two numbers and
+  nothing else: it is not an accusation of paid promotion, and 🟢 is never a buy signal.
+  "Pool left tracking" = the traded pool was no longer findable on the public trackers we
+  use at the 24-hour check — not proof of intent. Call outcomes cover the calls our sweeps
+  captured: a sample, never a census. Corrections get the same reach as the original claim.
+  Nothing here is financial advice.</p>
+  <p>generated 2026-09-05T17:41:00Z · regenerates every 30 minutes ·
+  method &amp; receipts: <a href="https://github.com/TrenchAutopsy/receipts" rel="noopener">TrenchAutopsy/receipts</a></p>
+</div></footer>
+
+<script>
+(function () {
+  "use strict";
+  var MOVERS = [{"en_pct": 12.47, "en_s": "+12.5%", "me_pct": 9.408983451536642, "me_s": "+9.4%", "name": "Raydium", "symbol": "RAY", "tag": "organic", "tag_label": "\ud83d\udfe2 ORGANIC", "tag_why": "mentions rising with engagement \u2014 new people arriving"}, {"en_pct": 5.35, "en_s": "+5.3%", "me_pct": 0.0, "me_s": "+0.0%", "name": "MAIGA Token", "symbol": "MAIGA", "tag": "quiet", "tag_label": "\u00b7 QUIET", "tag_why": "no meaningful engagement change this cycle"}, {"en_pct": 5.01, "en_s": "+5.0%", "me_pct": 21.956684092606423, "me_s": "+22.0%", "name": "dogwifhat", "symbol": "WIF", "tag": "quiet", "tag_label": "\u00b7 QUIET", "tag_why": "no meaningful engagement change this cycle"}, {"en_pct": 4.94, "en_s": "+4.9%", "me_pct": 0.3197130380536494, "me_s": "+0.3%", "name": "USDC", "symbol": "USDC", "tag": "quiet", "tag_label": "\u00b7 QUIET", "tag_why": "no meaningful engagement change this cycle"}, {"en_pct": 4.37, "en_s": "+4.4%", "me_pct": -1.4827018121911038, "me_s": "-1.5%", "name": "Polkadot", "symbol": "DOT", "tag": "quiet", "tag_label": "\u00b7 QUIET", "tag_why": "no meaningful engagement change this cycle"}, {"en_pct": 3.76, "en_s": "+3.8%", "me_pct": -1.4285714285714286, "me_s": "-1.4%", "name": "Convex Finance", "symbol": "CVX", "tag": "quiet", "tag_label": "\u00b7 QUIET", "tag_why": "no meaningful engagement change this cycle"}, {"en_pct": 3.69, "en_s": "+3.7%", "me_pct": 0.48622366288492713, "me_s": "+0.5%", "name": "Hemi", "symbol": "HEMI", "tag": "quiet", "tag_label": "\u00b7 QUIET", "tag_why": "no meaningful engagement change this cycle"}, {"en_pct": 3.59, "en_s": "+3.6%", "me_pct": -1.098901098901099, "me_s": "-1.1%", "name": "OKB", "symbol": "OKB", "tag": "quiet", "tag_label": "\u00b7 QUIET", "tag_why": "no meaningful engagement change this cycle"}, {"en_pct": 2.92, "en_s": "+2.9%", "me_pct": -1.4397905759162304, "me_s": "-1.4%", "name": "Baby Doge 2.0", "symbol": "BABYDOGE", "tag": "quiet", "tag_label": "\u00b7 QUIET", "tag_why": "no meaningful engagement change this cycle"}, {"en_pct": 2.84, "en_s": "+2.8%", "me_pct": -0.16863406408094433, "me_s": "-0.2%", "name": "Ambire Wallet", "symbol": "WALLET", "tag": "quiet", "tag_label": "\u00b7 QUIET", "tag_why": "no meaningful engagement change this cycle"}];
+  var SPARK  = {"BABYDOGE": [326978, 315785, 318037, 326838, 326813, 325298, 323768, 310958, 312005, 307288, 306426, 305781, 305300, 319142, 318971, 315597, 313886, 318496, 313505, 312473, 325737, 326809, 328352, 337948], "CVX": [346808, 343799, 402789, 402635, 548791, 447396, 590440, 603439, 807304, 805936, 981981, 981113, 1162045, 811962, 842525], "DOT": [347728, 356886, 333226, 327939, 327782, 341901, 340113, 347424, 343977, 339972, 342252, 350615, 350279, 365385, 364575, 383856, 383576, 397235, 397016, 407903, 406984, 400936, 391957, 409079], "HEMI": [276954, 276460, 303296, 302068, 328884, 310180, 320165, 319461, 329702, 327894, 338250, 338600, 351081], "MAIGA": [300027, 300027, 336013, 313352, 353151, 337493, 344174, 330360, 350893, 350893, 370954, 370552, 390363], "OKB": [543562, 549967, 545603, 532553, 534112, 527240, 526634, 521552, 531153, 545043, 546502, 544269, 536245, 539626, 537884, 540673, 551229, 562880, 575454, 581502, 586157, 672382, 661628, 685408], "RAY": [857521, 855059, 853430, 841714, 839712, 819216, 816801, 794151, 788949, 759036, 759095, 563401, 559338, 558421, 558492, 574042, 589378, 714246, 717238, 766307, 760169, 868157, 864615, 972399], "USDC": [6915054, 6834501, 6830324, 8105401, 8096134, 9453179, 9428129, 10720140, 10481490, 11814833, 12069591, 13333760, 13304171, 14679609, 14602664, 16245957, 15609970, 15348135, 15185649, 15979425, 15836490, 16583637, 16438073, 17249354], "WALLET": [293994, 292593, 296414, 292390, 287258, 285157, 293250], "WIF": [585870, 590470, 592328, 601004, 599958, 603292, 602587, 597120, 614514, 650208, 650354, 677057, 676093, 689479, 680292, 693180, 690045, 683712, 683514, 686913, 681738, 708498, 688410, 722926]};
+  var GEN    = 1788630060;
+
+  /* ---------- router ---------- */
+  var VIEWS = ["/", "/board", "/receipts", "/method", "/bot"];
+  function route() {
+    var h = (location.hash || "#/").slice(1);
+    if (VIEWS.indexOf(h) === -1) h = "/";
+    var id = "v-" + (h === "/" ? "home" : h.slice(1));
+    VIEWS.forEach(function (v) {
+      var el = document.getElementById("v-" + (v === "/" ? "home" : v.slice(1)));
+      if (el) el.classList.toggle("on", el.id === id);
+    });
+    document.querySelectorAll(".navlinks a").forEach(function (a) {
+      if (a.dataset.route === h) a.setAttribute("aria-current", "page");
+      else a.removeAttribute("aria-current");
+    });
+    window.scrollTo(0, 0);
+  }
+  window.addEventListener("hashchange", route);
+
+  /* ---------- freshness readout ---------- */
+  function age() {
+    var mins = Math.max(0, Math.round((Date.now() / 1000 - GEN) / 60));
+    var el = document.getElementById("liveAge"), dot = document.getElementById("liveDot");
+    if (!el) return;
+    el.textContent = mins < 1 ? "just now" : mins < 60 ? mins + "m ago"
+                   : Math.floor(mins / 60) + "h " + (mins % 60) + "m ago";
+    // 45 min = one missed 30-min cycle plus slack; matches the server-side staleness rule
+    dot.classList.toggle("stale", mins > 45);
+  }
+
+  /* ---------- sparkline ---------- */
+  function spark(vals, cls) {
+    var w = 76, h = 22, n = vals.length;
+    if (n < 2) return "";
+    var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+    var span = (hi - lo) || 1, pts = [];
+    for (var i = 0; i < n; i++) {
+      var x = (i / (n - 1)) * (w - 2) + 1;
+      var y = h - 1 - ((vals[i] - lo) / span) * (h - 2);
+      pts.push(x.toFixed(1) + "," + y.toFixed(1));
+    }
+    var stroke = cls === "flat" ? "#E5484D" : cls === "thin" ? "#E0B457" : "#63D2C5";
+    var last = pts[pts.length - 1].split(",");
+    return '<svg class="spark" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h +
+      '" aria-hidden="true"><polyline fill="none" stroke="' + stroke + '" stroke-width="1.5" ' +
+      'stroke-linejoin="round" stroke-linecap="round" opacity=".85" points="' + pts.join(" ") +
+      '"/><circle cx="' + last[0] + '" cy="' + last[1] + '" r="2" fill="' + stroke + '"/></svg>';
+  }
+
+  /* ---------- board ---------- */
+  var state = { filter: "all", q: "", key: "en_pct", dir: "desc" };
+  var body = document.getElementById("boardBody");
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function render() {
+    if (!body) return;
+    var rows = MOVERS.filter(function (m) {
+      if (state.filter !== "all" && m.tag !== state.filter) return false;
+      if (state.q && m.symbol.toLowerCase().indexOf(state.q) === -1
+          && String(m.name || "").toLowerCase().indexOf(state.q) === -1) return false;
+      return true;
+    });
+    var k = state.key, sign = state.dir === "desc" ? -1 : 1;
+    rows.sort(function (a, b) {
+      var x = a[k], y = b[k];
+      if (x === null || x === undefined) x = -Infinity;
+      if (y === null || y === undefined) y = -Infinity;
+      if (typeof x === "string") return sign * x.localeCompare(y);
+      return sign * (x - y);
+    });
+
+    if (!rows.length) {
+      body.innerHTML = '<tr><td colspan="6" class="empty">Nothing matches that filter right now.</td></tr>';
+      return;
+    }
+    body.innerHTML = rows.map(function (m, i) {
+      var meCls = m.me_pct > 0 ? "up" : m.me_pct < 0 ? "down" : "";
+      return '<tr><td class="num">' + (i + 1) + '</td>' +
+        '<td><span class="sym">$' + esc(m.symbol) + '</span>' +
+        (m.name ? ' <span class="name">· ' + esc(m.name) + '</span>' : '') + '</td>' +
+        '<td class="num ' + (m.en_pct >= 0 ? "up" : "down") + '">' + esc(m.en_s) + '</td>' +
+        '<td class="num ' + meCls + '">' + esc(m.me_s) + '</td>' +
+        '<td>' + spark(SPARK[m.symbol.toUpperCase()] || [], m.tag) + '</td>' +
+        '<td><span class="chip ' + esc(m.tag) + '" title="' + esc(m.tag_why) + '">' +
+        esc(m.tag_label) + '</span></td></tr>';
+    }).join("");
+  }
+
+  function counts() {
+    var c = { all: MOVERS.length, organic: 0, thin: 0, flat: 0 };
+    MOVERS.forEach(function (m) { if (c[m.tag] !== undefined) c[m.tag]++; });
+    [["cAll", "all"], ["cOrganic", "organic"], ["cThin", "thin"], ["cFlat", "flat"]]
+      .forEach(function (p) {
+        var el = document.getElementById(p[0]);
+        if (el) el.textContent = c[p[1]];
+      });
+    var ho = document.getElementById("hOrganic"), hf = document.getElementById("hFlat");
+    if (ho) ho.textContent = c.organic;
+    if (hf) hf.textContent = c.flat;
+  }
+
+  document.querySelectorAll("#filters .fbtn").forEach(function (b) {
+    b.addEventListener("click", function () {
+      state.filter = b.dataset.f;
+      document.querySelectorAll("#filters .fbtn").forEach(function (o) {
+        o.setAttribute("aria-pressed", String(o === b));
+      });
+      render();
+    });
+  });
+  var search = document.getElementById("search");
+  if (search) search.addEventListener("input", function () {
+    state.q = search.value.trim().toLowerCase(); render();
+  });
+  document.querySelectorAll("th.s").forEach(function (th) {
+    th.addEventListener("click", function () {
+      var k = th.dataset.k;
+      state.dir = (state.key === k && state.dir === "desc") ? "asc" : "desc";
+      state.key = k;
+      document.querySelectorAll("th.s").forEach(function (o) { o.removeAttribute("data-dir"); });
+      th.setAttribute("data-dir", state.dir);
+      render();
+    });
+  });
+
+  /* ---------- hero backdrop: the dumbbell thesis, drawn ---------- */
+  function heroCanvas() {
+    var c = document.getElementById("heroCanvas");
+    if (!c || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var ctx = c.getContext("2d"), pairs = [];
+    function size() {
+      var r = c.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
+      c.width = r.width * dpr; c.height = r.height * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      pairs = [];
+      var n = Math.max(5, Math.round(r.width / 150));
+      for (var i = 0; i < n; i++) {
+        // each pair = one token: a dim "mentions" dot tethered to a bright "engagement"
+        // dot. Wide gap = manufactured. The page's whole thesis as ambient motion.
+        pairs.push({ x: Math.random() * r.width, y: Math.random() * r.height,
+                     gap: 26 + Math.random() * 62, a: Math.random() * Math.PI * 2,
+                     sp: 0.00016 + Math.random() * 0.00042, r: 2.5 + Math.random() * 4 });
+      }
+    }
+    function frame(t) {
+      var r = c.getBoundingClientRect();
+      ctx.clearRect(0, 0, r.width, r.height);
+      pairs.forEach(function (p) {
+        var a = p.a + t * p.sp;
+        var x2 = p.x + Math.cos(a) * p.gap, y2 = p.y + Math.sin(a) * p.gap * 0.42;
+        ctx.strokeStyle = "rgba(35,120,113,.5)"; ctx.lineWidth = 1.4;
+        ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(x2, y2); ctx.stroke();
+        ctx.fillStyle = "rgba(35,120,113,.75)";
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r * 0.55, 0, 6.284); ctx.fill();
+        ctx.fillStyle = "rgba(99,210,197,.62)";
+        ctx.beginPath(); ctx.arc(x2, y2, p.r, 0, 6.284); ctx.fill();
+      });
+      requestAnimationFrame(frame);
+    }
+    size(); addEventListener("resize", size); requestAnimationFrame(frame);
+  }
+
+  route(); counts(); render(); age(); heroCanvas();
+  setInterval(age, 30000);
+  // full reload on the next expected publish, so an open tab never shows a dead board
+  setTimeout(function () { location.reload(); }, 15 * 60 * 1000);
+})();
+</script>
+</body>
+</html>
